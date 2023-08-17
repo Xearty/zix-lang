@@ -19,6 +19,19 @@
     MACRO(IDENTIFIER) \
     MACRO(END_OF_FILE)
 
+// Tokens that don't have any more
+// state except for the type of token
+// (used for generating parsing functions)
+#define MONOSTATE_TOKEN_LIST(MACRO) \
+    MACRO("fn", FUNCTION) \
+    MACRO("(", LPAREN) \
+    MACRO(")", RPAREN) \
+    MACRO("->", ARROW) \
+    MACRO("{", LCURLY) \
+    MACRO("}", RCURLY) \
+    MACRO("return", RETURN) \
+    MACRO(";", SEMI_COLON)
+
 #define DECLARE_TOKENS(NAME) NAME,
 
 enum class TokenType {
@@ -51,11 +64,11 @@ Token CreateTokenString(std::string value) {
 
 struct DebugValueVisitor {
     void operator()(const std::string& value) {
-        std::cout << "(String: " << value << ')' << std::endl;
+        std::cout << "(String: " << value << ')';
     }
 
     void operator()(int value) {
-        std::cout << "(Integer: " << value << ')' << std::endl;
+        std::cout << "(Integer: " << value << ')';
     }
 
     void operator()(std::monostate value) {}

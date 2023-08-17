@@ -3,6 +3,7 @@
 #include "Result.h"
 #include "Token.h"
 #include "FileUtils.h"
+#include "Utils.h"
 
 #include <iostream>
 
@@ -61,15 +62,22 @@ bool TryParseToken(Lexer& lexer, Token& token) {
     return false;
 }
 
-template <>
-bool TryParseToken<TokenType::FUNCTION>(Lexer& lexer, Token& token) {
-    if (lexer.Peek() == 'f' && lexer.Peek(1) == 'n') {
-        lexer.Advance(2);
-        token = CreateToken<TokenType::FUNCTION>();
-        return true;
+#define GENERATE_MONOSTATE_TOKEN_PARSING_FUNCTIONS(TOKEN_STRING, TOKEN_NAME) \
+    template <>                                                              \
+    bool TryParseToken<TokenType::TOKEN_NAME>(Lexer& lexer, Token& token) {  \
+        const size_t len = STR_LIT_LEN(TOKEN_STRING);                        \
+        for (size_t i = 0; i < len; ++i) {                                   \
+            if (lexer.Peek(i) != (TOKEN_STRING)[i]) {                        \
+                return false;                                                \
+            }                                                                \
+        }                                                                    \
+        lexer.Advance(len);                                                  \
+        token = CreateToken<TokenType::TOKEN_NAME>();                        \
+        return true;                                                         \
     }
-    return false;
-}
+
+MONOSTATE_TOKEN_LIST(GENERATE_MONOSTATE_TOKEN_PARSING_FUNCTIONS)
+#undef GENERATE_MONOSTATE_TOKEN_PARSING_FUNCTIONS
 
 template <>
 bool TryParseToken<TokenType::IDENTIFIER>(Lexer& lexer, Token& token) {
