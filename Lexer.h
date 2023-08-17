@@ -96,6 +96,26 @@ bool TryParseToken<TokenType::IDENTIFIER>(Lexer& lexer, Token& token) {
     return true;
 }
 
+template <>
+bool TryParseToken<TokenType::INT_LITERAL>(Lexer& lexer, Token& token) {
+    int value = 0;
+    int litLen = 0;
+    while (lexer.Peek(litLen) >= '0' && lexer.Peek(litLen) <= '9') {
+        int digit = lexer.Peek(litLen) - '0';
+        value = value * 10 + digit;
+        ++litLen;
+    }
+
+    // Currently we disallow letters after the integer expression
+    if (litLen == 0 || std::isalpha(lexer.Peek(litLen))) {
+        return false;
+    }
+
+    lexer.Advance(litLen);
+    token = CreateTokenInteger<TokenType::INT_LITERAL>(value);
+    return true;
+}
+
 bool TryParseNextToken(Lexer& lexer, Token& token) {
 #define TRY_PARSE_TOKEN(NAME) || TryParseToken<TokenType::NAME>(lexer, token)
     return false

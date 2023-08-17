@@ -62,6 +62,13 @@ Token CreateTokenString(std::string value) {
     return token;
 }
 
+template <TokenType TType>
+Token CreateTokenInteger(int value) {
+    Token token = CreateToken<TType>();
+    token.data = value;
+    return token;
+}
+
 struct DebugValueVisitor {
     void operator()(const std::string& value) {
         std::cout << "(String: " << value << ')';
