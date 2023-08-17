@@ -15,7 +15,11 @@
     MACRO(RCURLY) \
     MACRO(RETURN) \
     MACRO(INT_LITERAL) \
+    MACRO(STR_LITERAL) \
     MACRO(SEMI_COLON) \
+    MACRO(COLON) \
+    MACRO(DOT) \
+    MACRO(COMMA) \
     MACRO(IDENTIFIER) \
     MACRO(END_OF_FILE)
 
@@ -30,7 +34,11 @@
     MACRO("{", LCURLY) \
     MACRO("}", RCURLY) \
     MACRO("return", RETURN) \
-    MACRO(";", SEMI_COLON)
+    MACRO(";", SEMI_COLON) \
+    MACRO(":", COLON) \
+    MACRO(".", DOT) \
+    MACRO(",", COMMA)
+
 
 #define DECLARE_TOKENS(NAME) NAME,
 

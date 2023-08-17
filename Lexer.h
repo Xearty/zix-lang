@@ -5,6 +5,7 @@
 #include "FileUtils.h"
 #include "Utils.h"
 
+#include <string_view>
 #include <iostream>
 
 enum class LexError {
@@ -33,6 +34,14 @@ struct Lexer {
             }
         }
         return true;
+    }
+
+    const std::string_view GetView(int begin, int end) const {
+        return std::string_view(stream + begin, end - begin);
+    }
+
+    int GetOffset() const {
+        return offset;
     }
 };
 
@@ -113,6 +122,26 @@ bool TryParseToken<TokenType::INT_LITERAL>(Lexer& lexer, Token& token) {
 
     lexer.Advance(litLen);
     token = CreateTokenInteger<TokenType::INT_LITERAL>(value);
+    return true;
+}
+
+template <>
+bool TryParseToken<TokenType::STR_LITERAL>(Lexer& lexer, Token& token) {
+    if (lexer.Peek() != '"') {
+        return false;
+    }
+
+    lexer.Advance();
+
+    int begin = lexer.GetOffset();
+    while (lexer.Peek() != '"') {
+        lexer.Advance();
+    }
+
+    std::string value = std::string(lexer.GetView(begin, lexer.GetOffset()));
+    lexer.Advance();
+
+    token = CreateTokenString<TokenType::STR_LITERAL>(std::move(value));
     return true;
 }
 
