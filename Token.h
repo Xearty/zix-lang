@@ -3,10 +3,10 @@
 #include <vector>
 #include <variant>
 #include <string>
+#include <iostream>
 
 #define TOKEN_LIST(MACRO) \
     MACRO(INVALID) \
-    MACRO(IDENTIFIER) \
     MACRO(FUNCTION) \
     MACRO(LPAREN) \
     MACRO(RPAREN) \
@@ -16,6 +16,7 @@
     MACRO(RETURN) \
     MACRO(INT_LITERAL) \
     MACRO(SEMI_COLON) \
+    MACRO(IDENTIFIER) \
     MACRO(END_OF_FILE)
 
 #define DECLARE_TOKENS(NAME) NAME,
@@ -26,7 +27,7 @@ enum class TokenType {
 
 #undef DECLARE_TOKENS
 
-using TokenData = std::variant<std::string, int>;
+using TokenData = std::variant<std::monostate, std::string, int>;
 using TokenCollection = std::vector<struct Token>;
 
 struct Token {
@@ -40,4 +41,23 @@ Token CreateToken() {
     token.type = TType;
     return token;
 }
+
+template <TokenType TType>
+Token CreateTokenString(std::string value) {
+    Token token = CreateToken<TType>();
+    token.data = std::move(value);
+    return token;
+}
+
+struct DebugValueVisitor {
+    void operator()(const std::string& value) {
+        std::cout << "(String: " << value << ')' << std::endl;
+    }
+
+    void operator()(int value) {
+        std::cout << "(Integer: " << value << ')' << std::endl;
+    }
+
+    void operator()(std::monostate value) {}
+};
 
