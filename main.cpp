@@ -71,12 +71,10 @@ public:
     }
 
     ExpressionPtr ParseVariableDeclaration() {
-        if (Consume(TokenType::LET) && Consume(TokenType::EQUALS)) {
-            if (Consume(TokenType::IDENTIFIER)) {
-                const Token& identToken = GetPrevToken();
-                std::string ident = std::get<std::string>(identToken.data);
-                // @TODO(xearty): do something with the identifier
-            }
+        if (Consume(TokenType::LET) && Consume(TokenType::EQUALS) && Consume(TokenType::IDENTIFIER)) {
+            const Token& identToken = GetPrevToken();
+            std::string ident = std::get<std::string>(identToken.data);
+            // @TODO(xearty): do something with the identifier
         }
 
         return nullptr;
@@ -87,13 +85,11 @@ public:
             const Token& paramNameIdent = GetPrevToken();
             std::string paramName = std::get<std::string>(paramNameIdent.data);
 
-            if (Consume(TokenType::COLON)) {
-                if (Consume(TokenType::IDENTIFIER)) {
-                    const Token& paramTypeIdent = GetPrevToken();
-                    std::string paramType = std::get<std::string>(paramTypeIdent.data);
-                    params.push_back(FuncParam{ std::move(paramName), std::move(paramType) });
-                    return true;
-                }
+            if (Consume(TokenType::COLON) && Consume(TokenType::IDENTIFIER)) {
+                const Token& paramTypeIdent = GetPrevToken();
+                std::string paramType = std::get<std::string>(paramTypeIdent.data);
+                params.push_back(FuncParam{ std::move(paramName), std::move(paramType) });
+                return true;
             }
         }
         return false;
@@ -127,25 +123,21 @@ public:
             return nullptr;
         };
 
-        if (Consume(TokenType::FUNCTION)) {
-            if (Consume(TokenType::IDENTIFIER)) {
-                const Token& identToken = GetPrevToken();
-                std::string functionIdent = std::get<std::string>(identToken.data);
+        if (Consume(TokenType::FUNCTION) && Consume(TokenType::IDENTIFIER)) {
+            const Token& identToken = GetPrevToken();
+            std::string functionIdent = std::get<std::string>(identToken.data);
 
-                std::vector<FuncParam> params;
-                if (ParseParameterList(params)) {
-                    if (Consume(TokenType::ARROW)) {
-                        if (Consume(TokenType::IDENTIFIER)) {
-                            const Token& returnTypeIdent = GetPrevToken();
-                            std::string returnType = std::get<std::string>(returnTypeIdent.data);
+            std::vector<FuncParam> params;
+            if (ParseParameterList(params)) {
+                if (Consume(TokenType::ARROW) && Consume(TokenType::IDENTIFIER)) {
+                    const Token& returnTypeIdent = GetPrevToken();
+                    std::string returnType = std::get<std::string>(returnTypeIdent.data);
 
-                            if (auto body = ParseBody()) {
-                                return std::make_shared<FunctionDeclaration>(functionIdent, params, returnType, body);
-                            }
-                        }
+                    if (auto body = ParseBody()) {
+                        return std::make_shared<FunctionDeclaration>(functionIdent, params, returnType, body);
                     }
-
                 }
+
             }
         }
 
