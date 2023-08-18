@@ -63,17 +63,10 @@ Token CreateToken() {
     return token;
 }
 
-template <TokenType TType>
-Token CreateTokenString(std::string value) {
+template <TokenType TType, typename ValueType>
+Token CreateTokenData(ValueType value) {
     Token token = CreateToken<TType>();
     token.data = std::move(value);
-    return token;
-}
-
-template <TokenType TType>
-Token CreateTokenInteger(int value) {
-    Token token = CreateToken<TType>();
-    token.data = value;
     return token;
 }
 

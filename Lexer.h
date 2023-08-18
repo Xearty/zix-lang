@@ -106,7 +106,7 @@ bool TryParseToken<TokenType::IDENTIFIER>(Lexer& lexer, Token& token) {
         lexer.Advance();
     }
 
-    token = CreateTokenString<TokenType::IDENTIFIER>(std::move(value));
+    token = CreateTokenData<TokenType::IDENTIFIER>(std::move(value));
     return true;
 }
 
@@ -126,7 +126,7 @@ bool TryParseToken<TokenType::INT_LITERAL>(Lexer& lexer, Token& token) {
     }
 
     lexer.Advance(litLen);
-    token = CreateTokenInteger<TokenType::INT_LITERAL>(value);
+    token = CreateTokenData<TokenType::INT_LITERAL>(value);
     return true;
 }
 
@@ -146,7 +146,7 @@ bool TryParseToken<TokenType::STR_LITERAL>(Lexer& lexer, Token& token) {
     std::string value = std::string(lexer.GetView(begin, lexer.GetOffset()));
     lexer.Advance();
 
-    token = CreateTokenString<TokenType::STR_LITERAL>(std::move(value));
+    token = CreateTokenData<TokenType::STR_LITERAL>(std::move(value));
     return true;
 }
 
