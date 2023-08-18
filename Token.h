@@ -8,6 +8,9 @@
 #define TOKEN_LIST(MACRO) \
     MACRO(INVALID)        \
     MACRO(FUNCTION)       \
+    MACRO(FOR)            \
+    MACRO(LET)            \
+    MACRO(EQUALS)         \
     MACRO(LPAREN)         \
     MACRO(RPAREN)         \
     MACRO(ARROW)          \
@@ -28,6 +31,9 @@
 // (used for generating parsing functions)
 #define MONOSTATE_TOKEN_LIST(MACRO) \
     MACRO("fn", FUNCTION)           \
+    MACRO("for", FOR)               \
+    MACRO("let", LET)               \
+    MACRO("=", EQUALS)              \
     MACRO("(", LPAREN)              \
     MACRO(")", RPAREN)              \
     MACRO("->", ARROW)              \
