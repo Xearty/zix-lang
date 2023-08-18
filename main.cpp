@@ -50,8 +50,6 @@ using ExpressionPtr = std::shared_ptr<ASTNode>;
 
 EXPRESSION_LIST(DEFINE_EXPRESSIONS);
 
-#define LIST_EXPRESSIONS(NAME, PROPERTIES) NAME,
-
 class Parser {
 public:
     explicit Parser(const TokenCollection& tokens)
