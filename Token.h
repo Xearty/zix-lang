@@ -6,37 +6,37 @@
 #include <iostream>
 
 #define TOKEN_LIST(MACRO) \
-    MACRO(INVALID) \
-    MACRO(FUNCTION) \
-    MACRO(LPAREN) \
-    MACRO(RPAREN) \
-    MACRO(ARROW) \
-    MACRO(LCURLY) \
-    MACRO(RCURLY) \
-    MACRO(RETURN) \
-    MACRO(INT_LITERAL) \
-    MACRO(STR_LITERAL) \
-    MACRO(SEMI_COLON) \
-    MACRO(COLON) \
-    MACRO(DOT) \
-    MACRO(COMMA) \
-    MACRO(IDENTIFIER) \
+    MACRO(INVALID)        \
+    MACRO(FUNCTION)       \
+    MACRO(LPAREN)         \
+    MACRO(RPAREN)         \
+    MACRO(ARROW)          \
+    MACRO(LCURLY)         \
+    MACRO(RCURLY)         \
+    MACRO(RETURN)         \
+    MACRO(INT_LITERAL)    \
+    MACRO(STR_LITERAL)    \
+    MACRO(SEMI_COLON)     \
+    MACRO(COLON)          \
+    MACRO(DOT)            \
+    MACRO(COMMA)          \
+    MACRO(IDENTIFIER)     \
     MACRO(END_OF_FILE)
 
 // Tokens that don't have any more
 // state except for the type of token
 // (used for generating parsing functions)
 #define MONOSTATE_TOKEN_LIST(MACRO) \
-    MACRO("fn", FUNCTION) \
-    MACRO("(", LPAREN) \
-    MACRO(")", RPAREN) \
-    MACRO("->", ARROW) \
-    MACRO("{", LCURLY) \
-    MACRO("}", RCURLY) \
-    MACRO("return", RETURN) \
-    MACRO(";", SEMI_COLON) \
-    MACRO(":", COLON) \
-    MACRO(".", DOT) \
+    MACRO("fn", FUNCTION)           \
+    MACRO("(", LPAREN)              \
+    MACRO(")", RPAREN)              \
+    MACRO("->", ARROW)              \
+    MACRO("{", LCURLY)              \
+    MACRO("}", RCURLY)              \
+    MACRO("return", RETURN)         \
+    MACRO(";", SEMI_COLON)          \
+    MACRO(":", COLON)               \
+    MACRO(".", DOT)                 \
     MACRO(",", COMMA)
 
 
