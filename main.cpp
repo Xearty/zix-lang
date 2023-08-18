@@ -4,11 +4,10 @@
 #include "Utils.h"
 
 int main() {
-    auto lexer = CreateLexer("./program.zix");
-    defer(DestroyLexer(lexer));
+    Lexer lexer("./program.zix");
 
     std::cout << "Program:\n";
-    std::cout << lexer.stream << std::endl;
+    std::cout << lexer.GetStream() << std::endl;
 
     std::cout << "Tokens:\n";
     auto tokens = Tokenize(lexer).expect("Could not tokenize program");

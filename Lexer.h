@@ -9,52 +9,57 @@
 #include <iostream>
 
 enum class LexError {
+    NO_STREAM,
     INVALID_TOKEN,
 };
 
 struct Lexer {
-    const char* stream;
-    int offset;
+    explicit Lexer(const char* filename)
+        : m_Stream(FileUtils::ReadFile(filename))
+    {}
+
+    ~Lexer() {
+        delete m_Stream;
+    }
+
     char Peek(int lookAhead = 0) const {
-        return stream[offset + lookAhead];
+        return m_Stream[m_Offset + lookAhead];
     }
 
     void Advance(int steps = 1) {
-        offset += steps;
+        m_Offset += steps;
     }
 
-    bool IsFinished() const {
-        return !stream || Peek() == '\0';
+    void Done() {
+        m_IsDone = true;
     }
 
-    bool Ensure(int span) const {
-        for (int i = 0; i < span; ++i) {
-            if (stream[offset + span] == '\0') {
-                return false;
-            }
-        }
-        return true;
+    bool IsDone() const {
+        return m_IsDone;
+    }
+
+    bool HasStream() const {
+        return (bool)m_Stream;
     }
 
     const std::string_view GetView(int begin, int end) const {
-        return std::string_view(stream + begin, end - begin);
+        return std::string_view(m_Stream + begin, end - begin);
     }
 
     int GetOffset() const {
-        return offset;
+        return m_Offset;
     }
+
+    const char* GetStream() const {
+        return m_Stream;
+    }
+
+private:
+    const char* m_Stream = nullptr;
+    int m_Offset = 0;
+    bool m_IsDone = false;
+
 };
-
-Lexer CreateLexer(const char* filename) {
-    Lexer lexer;
-    lexer.stream = FileUtils::ReadFile(filename);
-    lexer.offset = 0;
-    return lexer;
-}
-
-void DestroyLexer(Lexer& lexer) {
-    delete lexer.stream;
-}
 
 void SkipWhitespace(Lexer& lexer) {
     while (std::isspace(lexer.Peek())) {
@@ -67,7 +72,7 @@ static constexpr bool AlwaysFalse = false;
 
 template <TokenType TType>
 bool TryParseToken(Lexer& lexer, Token& token) {
-    // static_assert(AlwaysFalse<TType>);
+    static_assert(AlwaysFalse<TType>);
     return false;
 }
 
@@ -145,6 +150,24 @@ bool TryParseToken<TokenType::STR_LITERAL>(Lexer& lexer, Token& token) {
     return true;
 }
 
+template <>
+bool TryParseToken<TokenType::END_OF_FILE>(Lexer& lexer, Token& token) {
+    bool reachedEOF =  !lexer.HasStream() || lexer.Peek() == '\0';
+    if (reachedEOF) {
+        token = CreateToken<TokenType::END_OF_FILE>();
+        lexer.Done();
+    }
+
+    return reachedEOF;
+}
+
+// Not sure if I need this but it will hopefully get optimized out
+// Currently exists because of the static assert
+template <>
+bool TryParseToken<TokenType::INVALID>(Lexer& lexer, Token& token) {
+    return false;
+}
+
 bool TryParseNextToken(Lexer& lexer, Token& token) {
 #define TRY_PARSE_TOKEN(NAME) || TryParseToken<TokenType::NAME>(lexer, token)
     return false
@@ -152,10 +175,16 @@ bool TryParseNextToken(Lexer& lexer, Token& token) {
 }
 
 auto Tokenize(Lexer& lexer) -> Result<TokenCollection, LexError> {
+    if (!lexer.HasStream()) {
+        return Err(LexError::NO_STREAM);
+    }
+
     TokenCollection tokens;
     Token token;
 
-    while (SkipWhitespace(lexer), !lexer.IsFinished()) {
+    while (!lexer.IsDone()) {
+        SkipWhitespace(lexer);
+
         if (TryParseNextToken(lexer, token)) {
             tokens.push_back(token);
         } else {
@@ -163,7 +192,6 @@ auto Tokenize(Lexer& lexer) -> Result<TokenCollection, LexError> {
         }
     }
 
-    tokens.push_back(CreateToken<TokenType::END_OF_FILE>());
     return Ok(std::move(tokens));
 }
 
