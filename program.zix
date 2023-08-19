@@ -1,4 +1,4 @@
 fn main(arg1: String, arg2: i32) -> Type {
-
+    let variable = 69;
 }
 

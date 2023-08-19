@@ -29,10 +29,23 @@ struct FuncParam {
     MACRO(String, ReturnType)                  \
     MACRO(ExpressionPtr, Body)
 
-#define EXPRESSION_LIST(MACRO)                                  \
-    MACRO(TopStatements, TOP_STATEMENTS_PROPERTIES)             \
-    MACRO(ForStatement, FOR_EXPRESSION_PROPERTIES)              \
-    MACRO(FunctionDeclaration, FUNCTION_DECLARATION_PROPERTIES)
+#define VARIABLE_DECLARATION_PROPERTIES(MACRO) \
+    MACRO(String, Name)                        \
+    MACRO(ExpressionPtr, InitialValue)
+
+#define INTEGER_LITERAL_EXPRESSION_PROPERTIES(MACRO) \
+    MACRO(int, Value)
+
+#define IDENTIFIER_EXPRESSION_PROPERTIES(MACRO) \
+    MACRO(String, Name)
+
+#define EXPRESSION_LIST(MACRO)                                             \
+    MACRO(TopStatements, TOP_STATEMENTS_PROPERTIES)                        \
+    MACRO(ForStatement, FOR_EXPRESSION_PROPERTIES)                         \
+    MACRO(FunctionDeclaration, FUNCTION_DECLARATION_PROPERTIES)            \
+    MACRO(VariableDeclaration, VARIABLE_DECLARATION_PROPERTIES)            \
+    MACRO(IntegerLiteralExpression, INTEGER_LITERAL_EXPRESSION_PROPERTIES) \
+    MACRO(IdentifierExpression, IDENTIFIER_EXPRESSION_PROPERTIES)
 
 #define GENERATE_FIELDS(TYPE, NAME) TYPE m_##NAME;
 
@@ -70,11 +83,33 @@ public:
         return m_Tokens[m_Current - 1];
     }
 
+    ExpressionPtr ParseExpression() {
+        if (Consume(TokenType::INT_LITERAL)) {
+            const Token& initialValueToken = GetPrevToken();
+            int initialValue = std::get<int>(initialValueToken.data);
+            return MakeShared<IntegerLiteralExpression>(initialValue);
+
+        } else if (Consume(TokenType::IDENTIFIER)) {
+            const Token& initialValueToken = GetPrevToken();
+            String initialValue = std::get<String>(initialValueToken.data);
+            return MakeShared<IdentifierExpression>(initialValue);
+        }
+
+        return nullptr;
+    }
+
     ExpressionPtr ParseVariableDeclaration() {
-        if (Consume(TokenType::LET) && Consume(TokenType::EQUALS) && Consume(TokenType::IDENTIFIER)) {
-            const Token& identToken = GetPrevToken();
-            String ident = std::get<String>(identToken.data);
-            // @TODO(xearty): do something with the identifier
+        if (Consume(TokenType::LET)) {
+            if (Consume(TokenType::IDENTIFIER)) {
+                auto identifierName = std::get<String>(GetPrevToken().data);
+                if (Consume(TokenType::EQUALS)) {
+                    if (auto initialValueExpr = ParseExpression()) {
+                        return MakeShared<VariableDeclaration>(identifierName, initialValueExpr);
+                    }
+
+                }
+            }
+
         }
 
         return nullptr;
@@ -146,6 +181,7 @@ public:
 
     ExpressionPtr ParseTopStatement() {
         return ParseFunctionDeclaration()
+            ?: ParseVariableDeclaration()
             ?: nullptr;
     }
 
