@@ -5,6 +5,8 @@
 #include <string>
 #include <iostream>
 
+#include "CommonTypes.h"
+
 #define TOKEN_LIST(MACRO) \
     MACRO(INVALID)        \
     MACRO(FUNCTION)       \
@@ -54,8 +56,8 @@ enum class TokenType {
 
 #undef DECLARE_TOKENS
 
-using TokenData = std::variant<std::monostate, std::string, int>;
-using TokenCollection = std::vector<struct Token>;
+using TokenData = std::variant<std::monostate, String, int>;
+using TokenCollection = Vector<struct Token>;
 
 struct Token {
     TokenType type;

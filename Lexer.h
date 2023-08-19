@@ -99,7 +99,7 @@ bool TryParseToken<TokenType::IDENTIFIER>(Lexer& lexer, Token& token) {
         return false;
     }
 
-    std::string value = "";
+    String value = "";
 
     while (std::isalnum(lexer.Peek()) || lexer.Peek() == '_') {
         value.push_back(lexer.Peek());
@@ -143,7 +143,7 @@ bool TryParseToken<TokenType::STR_LITERAL>(Lexer& lexer, Token& token) {
         lexer.Advance();
     }
 
-    std::string value = std::string(lexer.GetView(begin, lexer.GetOffset()));
+    String value = std::string(lexer.GetView(begin, lexer.GetOffset()));
     lexer.Advance();
 
     token = CreateTokenData<TokenType::STR_LITERAL>(std::move(value));
@@ -195,7 +195,7 @@ auto Tokenize(Lexer& lexer) -> Result<TokenCollection, LexError> {
     return Ok(std::move(tokens));
 }
 
-void PrintTokens(const std::vector<Token>& tokens) {
+void PrintTokens(const Vector<Token>& tokens) {
 #define CASE(NAME)                                   \
     case TokenType::NAME:                            \
         std::cout << #NAME << ' ';                   \

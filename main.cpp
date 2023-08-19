@@ -4,27 +4,29 @@
 #include "Lexer.h"
 #include "Utils.h"
 
+#include "CommonTypes.h"
+
 struct ASTNode {};
 
 struct FuncParam {
-    std::string name;
-    std::string type;
+    String name;
+    String type;
 };
 
 #define NO_PROPERTIES(MACRO)
 
 #define TOP_STATEMENTS_PROPERTIES(MACRO) \
-    MACRO(std::vector<ExpressionPtr>, Statements)
+    MACRO(Vector<ExpressionPtr>, Statements)
 
 #define FOR_EXPRESSION_PROPERTIES(MACRO) \
-    MACRO(ExpressionPtr, Initialization)      \
-    MACRO(ExpressionPtr, Condition)           \
+    MACRO(ExpressionPtr, Initialization) \
+    MACRO(ExpressionPtr, Condition)      \
     MACRO(ExpressionPtr, Increment)
 
 #define FUNCTION_DECLARATION_PROPERTIES(MACRO) \
-    MACRO(std::string, Name)                   \
-    MACRO(std::vector<FuncParam>, Parameters)  \
-    MACRO(std::string, ReturnType)             \
+    MACRO(String, Name)                        \
+    MACRO(Vector<FuncParam>, Parameters)       \
+    MACRO(String, ReturnType)                  \
     MACRO(ExpressionPtr, Body)
 
 #define EXPRESSION_LIST(MACRO)                                  \
@@ -37,7 +39,7 @@ struct FuncParam {
 #define EXPAND_INIT_PARAMETERS(TYPE, NAME) const TYPE& NAME,
 #define EXPAND_INIT_LIST(TYPE, NAME) m_##NAME(NAME),
 
-using ExpressionPtr = std::shared_ptr<ASTNode>;
+using ExpressionPtr = SharedPtr<ASTNode>;
 
 #define DEFINE_EXPRESSIONS(NAME, PROPERTIES)                                 \
     struct NAME : public ASTNode {                                           \
@@ -71,21 +73,21 @@ public:
     ExpressionPtr ParseVariableDeclaration() {
         if (Consume(TokenType::LET) && Consume(TokenType::EQUALS) && Consume(TokenType::IDENTIFIER)) {
             const Token& identToken = GetPrevToken();
-            std::string ident = std::get<std::string>(identToken.data);
+            String ident = std::get<String>(identToken.data);
             // @TODO(xearty): do something with the identifier
         }
 
         return nullptr;
     }
 
-    bool ParseParameter(std::vector<FuncParam>& params) {
+    bool ParseParameter(Vector<FuncParam>& params) {
         while (Consume(TokenType::IDENTIFIER)) {
             const Token& paramNameIdent = GetPrevToken();
-            std::string paramName = std::get<std::string>(paramNameIdent.data);
+            String paramName = std::get<String>(paramNameIdent.data);
 
             if (Consume(TokenType::COLON) && Consume(TokenType::IDENTIFIER)) {
                 const Token& paramTypeIdent = GetPrevToken();
-                std::string paramType = std::get<std::string>(paramTypeIdent.data);
+                String paramType = std::get<String>(paramTypeIdent.data);
                 params.push_back(FuncParam{ std::move(paramName), std::move(paramType) });
                 return true;
             }
@@ -94,7 +96,7 @@ public:
     }
 
     ExpressionPtr ParseFunctionDeclaration() {
-        auto ParseParameterList = [&](std::vector<FuncParam>& params) -> bool {
+        auto ParseParameterList = [&](Vector<FuncParam>& params) -> bool {
             if (Consume(TokenType::LPAREN)) {
                 while (ParseParameter(params)) {
                     if (!Consume(TokenType::COMMA)) {
@@ -123,16 +125,16 @@ public:
 
         if (Consume(TokenType::FUNCTION) && Consume(TokenType::IDENTIFIER)) {
             const Token& identToken = GetPrevToken();
-            std::string functionIdent = std::get<std::string>(identToken.data);
+            String functionIdent = std::get<String>(identToken.data);
 
-            std::vector<FuncParam> params;
+            Vector<FuncParam> params;
             if (ParseParameterList(params)) {
                 if (Consume(TokenType::ARROW) && Consume(TokenType::IDENTIFIER)) {
                     const Token& returnTypeIdent = GetPrevToken();
-                    std::string returnType = std::get<std::string>(returnTypeIdent.data);
+                    String returnType = std::get<String>(returnTypeIdent.data);
 
                     if (auto body = ParseBody()) {
-                        return std::make_shared<FunctionDeclaration>(functionIdent, params, returnType, body);
+                        return MakeShared<FunctionDeclaration>(functionIdent, params, returnType, body);
                     }
                 }
 
@@ -148,11 +150,11 @@ public:
     }
 
     ExpressionPtr ParseTopStatements() {
-        std::vector<ExpressionPtr> statements;
+        Vector<ExpressionPtr> statements;
         while (auto statement = ParseTopStatement()) {
             statements.push_back(std::move(statement));
         }
-        return std::make_shared<TopStatements>(statements);
+        return MakeShared<TopStatements>(statements);
     }
 
     static ExpressionPtr Parse(const TokenCollection& tokens) {
