@@ -38,17 +38,16 @@ public:
     }
 
     ExpressionPtr ParseVariableDeclaration() {
-        if (Consume(TokenType::LET)) {
-            if (Consume(TokenType::IDENTIFIER)) {
-                auto identifierName = std::get<String>(GetPrevToken().data);
-                if (Consume(TokenType::EQUALS)) {
-                    if (auto initialValueExpr = ParseExpression()) {
+        if (Consume(TokenType::LET) && Consume(TokenType::IDENTIFIER)) {
+            auto identifierName = std::get<String>(GetPrevToken().data);
+            if (Consume(TokenType::EQUALS)) {
+                if (auto initialValueExpr = ParseExpression()) {
+                    if (Consume(TokenType::SEMI_COLON)) {
                         return MakeShared<VariableDeclaration>(identifierName, initialValueExpr);
                     }
-
                 }
-            }
 
+            }
         }
 
         return nullptr;
