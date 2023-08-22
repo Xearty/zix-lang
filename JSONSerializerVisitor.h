@@ -5,37 +5,38 @@
 #include <iostream>
 #include <type_traits>
 
-#define SERIALIZE_PROPERTIES(TYPE, NAME) \
-    ++currentProp; \
-    std::cout << '"' << #NAME << "\": "; \
-    Serialize(node.Get##NAME()); \
+#define SERIALIZE_PROPERTIES(TYPE, NAME)             \
+    ++currentProp;                                   \
+    std::cout << '"' << #NAME << "\": ";             \
+    Serialize(node.Get##NAME());                     \
     PrepareForNextElement(currentProp != totalProps);
 
 #define COUNT_PROPERTIES(TYPE, NAME) ++totalProps;
 
-#define DEFINE_VISITOR_OVERLOADS(NAME, PROPERTIES) \
-    void Visit(const NAME& node) override {        \
-        int totalProps = 0;                        \
-        int currentProp = 0;                       \
-        PROPERTIES(COUNT_PROPERTIES);              \
-        \
-        std::cout << "{\n"; \
-        PushIndentLevel(); \
-        Indent(); \
-        std::cout << "\"NodeType\": \""#NAME"\""; \
-        if (totalProps > 0) { \
-            PrepareForNextElement(true); \
-        } \
-        PROPERTIES(SERIALIZE_PROPERTIES);          \
-        PopIndentLevel(); \
-        Indent(); \
-        std::cout << "}"; \
+#define DEFINE_VISITOR_OVERLOADS(NAME, PROPERTIES)  \
+    virtual void Visit(const NAME& node) override { \
+        int totalProps = 0;                         \
+        int currentProp = 0;                        \
+        PROPERTIES(COUNT_PROPERTIES);               \
+        std::cout << "{\n";                         \
+        PushIndentLevel();                          \
+        Indent();                                   \
+        std::cout << "\"NodeType\": \""#NAME"\"";   \
+        if (totalProps > 0) {                       \
+            PrepareForNextElement(true);            \
+        }                                           \
+        PROPERTIES(SERIALIZE_PROPERTIES);           \
+        PopIndentLevel();                           \
+        Indent();                                   \
+        std::cout << "}";                           \
     }
 
 
 class JSONSerializerVisitor final : public ASTVisitor {
+public:
     EXPRESSION_LIST(DEFINE_VISITOR_OVERLOADS);
 
+private:
     void Serialize(const ASTNodeRef& expr) {
         expr->Accept(*this);
     }
