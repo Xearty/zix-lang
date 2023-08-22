@@ -5,6 +5,7 @@
 #include "Utils.h"
 #include "ASTNode.h"
 #include "Parser.h"
+#include "JSONSerializerVisitor.h"
 
 #include "CommonTypes.h"
 
@@ -19,5 +20,7 @@ int main() {
     PrintTokens(tokens);
 
     ExpressionPtr astRoot = Parse(tokens);
+    std::cout << std::endl;
+    astRoot->Accept(JSONSerializerVisitor{});
 }
 

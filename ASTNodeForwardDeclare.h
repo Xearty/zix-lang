@@ -1,0 +1,8 @@
+#pragma once
+
+#include "ASTNodeDefinitions.h"
+
+#define FORWARD_DECLARE_AST_NODES(NAME, PROPERTIES) struct NAME;
+
+EXPRESSION_LIST(FORWARD_DECLARE_AST_NODES);
+

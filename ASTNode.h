@@ -1,61 +1,54 @@
 #pragma once
 
 #include "CommonTypes.h"
+#include "ASTVisitor.h"
+#include "ASTNodeDefinitions.h"
+
+struct ASTNode {
+    virtual const char* GetNodeName() const = 0;
+
+    virtual void Accept(ASTVisitor& visitor) = 0;
+    virtual void Accept(ASTVisitor&& visitor) = 0;
+};
 
 struct FuncParam {
     String name;
     String type;
 };
 
-struct ASTNode {};
-
-#define NO_PROPERTIES(MACRO)
-
-#define TOP_STATEMENTS_PROPERTIES(MACRO) \
-    MACRO(Vector<ExpressionPtr>, Statements)
-
-#define FOR_EXPRESSION_PROPERTIES(MACRO) \
-    MACRO(ExpressionPtr, Initialization) \
-    MACRO(ExpressionPtr, Condition)      \
-    MACRO(ExpressionPtr, Increment)
-
-#define FUNCTION_DECLARATION_PROPERTIES(MACRO) \
-    MACRO(String, Name)                        \
-    MACRO(Vector<FuncParam>, Parameters)       \
-    MACRO(String, ReturnType)                  \
-    MACRO(ExpressionPtr, Body)
-
-#define VARIABLE_DECLARATION_PROPERTIES(MACRO) \
-    MACRO(String, Name)                        \
-    MACRO(ExpressionPtr, InitialValue)
-
-#define INTEGER_LITERAL_EXPRESSION_PROPERTIES(MACRO) \
-    MACRO(int, Value)
-
-#define IDENTIFIER_EXPRESSION_PROPERTIES(MACRO) \
-    MACRO(String, Name)
-
-#define EXPRESSION_LIST(MACRO)                                             \
-    MACRO(TopStatements, TOP_STATEMENTS_PROPERTIES)                        \
-    MACRO(ForStatement, FOR_EXPRESSION_PROPERTIES)                         \
-    MACRO(FunctionDeclaration, FUNCTION_DECLARATION_PROPERTIES)            \
-    MACRO(VariableDeclaration, VARIABLE_DECLARATION_PROPERTIES)            \
-    MACRO(IntegerLiteralExpression, INTEGER_LITERAL_EXPRESSION_PROPERTIES) \
-    MACRO(IdentifierExpression, IDENTIFIER_EXPRESSION_PROPERTIES)
+using ExpressionPtr = SharedPtr<ASTNode>;
 
 #define GENERATE_FIELDS(TYPE, NAME) TYPE m_##NAME;
 
 #define EXPAND_INIT_PARAMETERS(TYPE, NAME) const TYPE& NAME,
 #define EXPAND_INIT_LIST(TYPE, NAME) m_##NAME(NAME),
 
-using ExpressionPtr = SharedPtr<ASTNode>;
+#define DEFINE_PROPERTY_GETTERS(TYPE, NAME) \
+    TYPE& Get##NAME() { return m_##NAME; }
+
+#define DEFINE_PROPERTY_GETTERS_CONST(TYPE, NAME) \
+    const TYPE& Get##NAME() const { return m_##NAME; }
 
 #define DEFINE_EXPRESSIONS(NAME, PROPERTIES)                                 \
-    struct NAME : public ASTNode {                                           \
+    struct NAME final : public ASTNode {                                     \
         explicit NAME(PROPERTIES(EXPAND_INIT_PARAMETERS) bool dummy = false) \
             : PROPERTIES(EXPAND_INIT_LIST) m_Dummy(dummy) {}                 \
                                                                              \
-        PROPERTIES(GENERATE_FIELDS)                                          \
+        void Accept(ASTVisitor& visitor) override {                          \
+            visitor.Visit(*this);                                            \
+        }                                                                    \
+                                                                             \
+        void Accept(ASTVisitor&& visitor) override {                         \
+            visitor.Visit(*this);                                            \
+        }                                                                    \
+                                                                             \
+        virtual const char* GetNodeName() const override {                   \
+            return #NAME;                                                    \
+        }                                                                    \
+                                                                             \
+        PROPERTIES(DEFINE_PROPERTY_GETTERS);                                 \
+        PROPERTIES(DEFINE_PROPERTY_GETTERS_CONST);                           \
+        PROPERTIES(GENERATE_FIELDS);                                         \
         bool m_Dummy = false;                                                \
     };
 
