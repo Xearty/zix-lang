@@ -11,8 +11,8 @@ namespace FileUtils
         rewind(file);
 
         char* buffer = new char[filesize + 1];
-        fread(buffer, sizeof(char), filesize, file);
-        buffer[filesize] = '\0';
+        size_t bytesRead = fread(buffer, sizeof(char), filesize, file);
+        buffer[bytesRead] = '\0';
         return buffer;
     }
 }
