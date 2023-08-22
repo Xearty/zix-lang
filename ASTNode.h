@@ -16,7 +16,7 @@ struct FuncParam {
     String type;
 };
 
-using ExpressionPtr = SharedPtr<ASTNode>;
+using ASTNodeRef = SharedPtr<ASTNode>;
 
 #define GENERATE_FIELDS(TYPE, NAME) TYPE m_##NAME;
 

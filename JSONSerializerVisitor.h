@@ -36,7 +36,7 @@
 class JSONSerializerVisitor final : public ASTVisitor {
     EXPRESSION_LIST(DEFINE_VISITOR_OVERLOADS);
 
-    void Serialize(const ExpressionPtr& expr) {
+    void Serialize(const ASTNodeRef& expr) {
         expr->Accept(*this);
     }
 
@@ -48,7 +48,7 @@ class JSONSerializerVisitor final : public ASTVisitor {
         std::cout << '"' << val << '"';
     }
 
-    void Serialize(const Vector<ExpressionPtr>& vec) {
+    void Serialize(const Vector<ASTNodeRef>& vec) {
         SerializeVector(vec);
     }
 

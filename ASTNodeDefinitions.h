@@ -3,22 +3,22 @@
 #define NO_PROPERTIES(MACRO)
 
 #define TOP_STATEMENTS_PROPERTIES(MACRO) \
-    MACRO(Vector<ExpressionPtr>, Statements)
+    MACRO(Vector<ASTNodeRef>, Statements)
 
 #define FOR_EXPRESSION_PROPERTIES(MACRO) \
-    MACRO(ExpressionPtr, Initialization) \
-    MACRO(ExpressionPtr, Condition)      \
-    MACRO(ExpressionPtr, Increment)
+    MACRO(ASTNodeRef, Initialization) \
+    MACRO(ASTNodeRef, Condition)      \
+    MACRO(ASTNodeRef, Increment)
 
 #define FUNCTION_DECLARATION_PROPERTIES(MACRO) \
     MACRO(String, Name)                        \
     MACRO(Vector<FuncParam>, Parameters)       \
     MACRO(String, ReturnType)                  \
-    MACRO(ExpressionPtr, Body)
+    MACRO(ASTNodeRef, Body)
 
 #define VARIABLE_DECLARATION_PROPERTIES(MACRO) \
     MACRO(String, Name)                        \
-    MACRO(ExpressionPtr, InitialValue)
+    MACRO(ASTNodeRef, InitialValue)
 
 #define INTEGER_LITERAL_EXPRESSION_PROPERTIES(MACRO) \
     MACRO(int, Value)

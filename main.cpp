@@ -19,7 +19,7 @@ int main() {
     auto tokens = Tokenize(lexer).expect("Could not tokenize program");
     PrintTokens(tokens);
 
-    ExpressionPtr astRoot = Parse(tokens);
+    ASTNodeRef astRoot = Parse(tokens);
     std::cout << std::endl;
     astRoot->Accept(JSONSerializerVisitor{});
 }

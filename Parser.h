@@ -22,7 +22,7 @@ public:
         return m_Tokens[m_Current - 1];
     }
 
-    ExpressionPtr ParseExpression() {
+    ASTNodeRef ParseExpression() {
         if (Consume(TokenType::INT_LITERAL)) {
             const Token& initialValueToken = GetPrevToken();
             int initialValue = std::get<int>(initialValueToken.data);
@@ -37,7 +37,7 @@ public:
         return nullptr;
     }
 
-    ExpressionPtr ParseVariableDeclaration() {
+    ASTNodeRef ParseVariableDeclaration() {
         if (Consume(TokenType::LET) && Consume(TokenType::IDENTIFIER)) {
             auto identifierName = std::get<String>(GetPrevToken().data);
             if (Consume(TokenType::EQUALS)) {
@@ -68,7 +68,7 @@ public:
         return false;
     }
 
-    ExpressionPtr ParseFunctionDeclaration() {
+    ASTNodeRef ParseFunctionDeclaration() {
         auto ParseParameterList = [&](Vector<FuncParam>& params) -> bool {
             if (Consume(TokenType::LPAREN)) {
                 while (ParseParameter(params)) {
@@ -84,7 +84,7 @@ public:
             return false;
         };
 
-        auto ParseBody = [&]() -> ExpressionPtr {
+        auto ParseBody = [&]() -> ASTNodeRef {
             if (Consume(TokenType::LCURLY)) {
                 if (auto statements = ParseTopStatements()) {
                     if (Consume(TokenType::RCURLY)) {
@@ -116,21 +116,21 @@ public:
         return nullptr;
     }
 
-    ExpressionPtr ParseTopStatement() {
+    ASTNodeRef ParseTopStatement() {
         if (auto decl = ParseFunctionDeclaration()) return decl;
         else if (auto decl = ParseVariableDeclaration()) return decl;
         return nullptr;
     }
 
-    ExpressionPtr ParseTopStatements() {
-        Vector<ExpressionPtr> statements;
+    ASTNodeRef ParseTopStatements() {
+        Vector<ASTNodeRef> statements;
         while (auto statement = ParseTopStatement()) {
             statements.push_back(std::move(statement));
         }
         return MakeShared<TopStatements>(statements);
     }
 
-    static ExpressionPtr Parse(const TokenCollection& tokens) {
+    static ASTNodeRef Parse(const TokenCollection& tokens) {
         Parser parser(tokens);
         return parser.ParseTopStatements();
     }
@@ -140,7 +140,7 @@ private:
     int m_Current = 0;
 };
 
-static ExpressionPtr Parse(const TokenCollection& tokens) {
+static ASTNodeRef Parse(const TokenCollection& tokens) {
     return Parser::Parse(tokens);
 }
 
