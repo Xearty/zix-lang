@@ -4,6 +4,8 @@
 #include "Token.h"
 #include "ASTNode.h"
 
+#include <cassert>
+
 class Parser {
 public:
     explicit Parser(const TokenCollection& tokens)
@@ -19,6 +21,7 @@ public:
     }
 
     const Token& GetPrevToken() const {
+        assert(m_Current > 0);
         return m_Tokens[m_Current - 1];
     }
 
