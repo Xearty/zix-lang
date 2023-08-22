@@ -110,7 +110,6 @@ public:
                         return MakeShared<FunctionDeclaration>(functionIdent, params, returnType, body);
                     }
                 }
-
             }
         }
 
@@ -118,9 +117,9 @@ public:
     }
 
     ExpressionPtr ParseTopStatement() {
-        return ParseFunctionDeclaration()
-            ?: ParseVariableDeclaration()
-            ?: nullptr;
+        if (auto decl = ParseFunctionDeclaration()) return decl;
+        else if (auto decl = ParseVariableDeclaration()) return decl;
+        return nullptr;
     }
 
     ExpressionPtr ParseTopStatements() {
