@@ -27,13 +27,11 @@ public:
 
     ASTNodeRef ParseExpression() {
         if (Consume(TokenType::INT_LITERAL)) {
-            const Token& initialValueToken = GetPrevToken();
-            int initialValue = std::get<int>(initialValueToken.data);
+            int initialValue = std::get<int>(GetPrevToken().data);
             return MakeShared<IntegerLiteralExpression>(initialValue);
 
         } else if (Consume(TokenType::IDENTIFIER)) {
-            const Token& initialValueToken = GetPrevToken();
-            String initialValue = std::get<String>(initialValueToken.data);
+            String initialValue = std::get<String>(GetPrevToken().data);
             return MakeShared<IdentifierExpression>(initialValue);
         }
 
@@ -58,12 +56,10 @@ public:
 
     bool ParseParameter(Vector<FuncParam>& params) {
         while (Consume(TokenType::IDENTIFIER)) {
-            const Token& paramNameIdent = GetPrevToken();
-            String paramName = std::get<String>(paramNameIdent.data);
+            String paramName = std::get<String>(GetPrevToken().data);
 
             if (Consume(TokenType::COLON) && Consume(TokenType::IDENTIFIER)) {
-                const Token& paramTypeIdent = GetPrevToken();
-                String paramType = std::get<String>(paramTypeIdent.data);
+                String paramType = std::get<String>(GetPrevToken().data);
                 params.push_back(FuncParam{ std::move(paramName), std::move(paramType) });
                 return true;
             }
@@ -100,14 +96,12 @@ public:
         };
 
         if (Consume(TokenType::FUNCTION) && Consume(TokenType::IDENTIFIER)) {
-            const Token& identToken = GetPrevToken();
-            String functionIdent = std::get<String>(identToken.data);
+            String functionIdent = std::get<String>(GetPrevToken().data);
 
             Vector<FuncParam> params;
             if (ParseParameterList(params)) {
                 if (Consume(TokenType::ARROW) && Consume(TokenType::IDENTIFIER)) {
-                    const Token& returnTypeIdent = GetPrevToken();
-                    String returnType = std::get<String>(returnTypeIdent.data);
+                    String returnType = std::get<String>(GetPrevToken().data);
 
                     if (auto body = ParseBody()) {
                         return MakeShared<FunctionDeclaration>(functionIdent, params, returnType, body);
