@@ -2,6 +2,7 @@
 
 #include "ASTNode.h"
 #include "ASTVisitor.h"
+#include "Token.h"
 #include <iostream>
 #include <type_traits>
 
@@ -47,6 +48,10 @@ private:
 
     void Serialize(const String& val) {
         std::cout << '"' << val << '"';
+    }
+
+    void Serialize(TokenType token) {
+        std::cout << '"' << GetTokenName(token) << '"';
     }
 
     void Serialize(const Vector<ASTNodeRef>& vec) {

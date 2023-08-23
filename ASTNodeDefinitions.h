@@ -26,11 +26,17 @@
 #define IDENTIFIER_EXPRESSION_PROPERTIES(MACRO) \
     MACRO(String, Name)
 
+#define BINARY_EXPRESSION_PROPERTIES(MACRO) \
+    MACRO(TokenType, Operator)              \
+    MACRO(ASTNodeRef, Left)                 \
+    MACRO(ASTNodeRef, Right)
+
 #define AST_NODES_LIST(MACRO)                                              \
     MACRO(TopStatements, TOP_STATEMENTS_PROPERTIES)                        \
     MACRO(ForStatement, FOR_STATEMENT_PROPERTIES)                          \
     MACRO(FunctionDeclaration, FUNCTION_DECLARATION_PROPERTIES)            \
     MACRO(VariableDeclaration, VARIABLE_DECLARATION_PROPERTIES)            \
     MACRO(IntegerLiteralExpression, INTEGER_LITERAL_EXPRESSION_PROPERTIES) \
-    MACRO(IdentifierExpression, IDENTIFIER_EXPRESSION_PROPERTIES)
+    MACRO(IdentifierExpression, IDENTIFIER_EXPRESSION_PROPERTIES)          \
+    MACRO(BinaryExpression, BINARY_EXPRESSION_PROPERTIES)
 

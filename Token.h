@@ -12,13 +12,17 @@
     MACRO(FUNCTION)       \
     MACRO(FOR)            \
     MACRO(LET)            \
+    MACRO(ARROW)          \
+    MACRO(RETURN)         \
     MACRO(EQUALS)         \
+    MACRO(PLUS)           \
+    MACRO(MINUS)          \
+    MACRO(STAR)           \
+    MACRO(SLASH)          \
     MACRO(LPAREN)         \
     MACRO(RPAREN)         \
-    MACRO(ARROW)          \
     MACRO(LCURLY)         \
     MACRO(RCURLY)         \
-    MACRO(RETURN)         \
     MACRO(INT_LITERAL)    \
     MACRO(STR_LITERAL)    \
     MACRO(SEMI_COLON)     \
@@ -36,12 +40,16 @@
     MACRO("for", FOR)               \
     MACRO("let", LET)               \
     MACRO("=", EQUALS)              \
+    MACRO("->", ARROW)              \
+    MACRO("return", RETURN)         \
+    MACRO("+", PLUS)                \
+    MACRO("-", MINUS)               \
+    MACRO("*", STAR)                \
+    MACRO("/", SLASH)               \
     MACRO("(", LPAREN)              \
     MACRO(")", RPAREN)              \
-    MACRO("->", ARROW)              \
     MACRO("{", LCURLY)              \
     MACRO("}", RCURLY)              \
-    MACRO("return", RETURN)         \
     MACRO(";", SEMI_COLON)          \
     MACRO(":", COLON)               \
     MACRO(".", DOT)                 \
@@ -88,5 +96,13 @@ struct DebugValueVisitor {
     }
 
     void operator()(std::monostate value) {}
+};
+
+static const char* GetTokenName(TokenType token) {
+    #define RETURN_TOKEN_NAME(NAME) case TokenType::NAME: return #NAME;
+    switch (token) {
+        TOKEN_LIST(RETURN_TOKEN_NAME);
+    }
+    return nullptr;
 };
 

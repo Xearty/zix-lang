@@ -6,6 +6,8 @@
 
 #include <cassert>
 
+#define TRY_PARSE(AST_NODE) if (auto node = Parse##AST_NODE()) return node
+
 class Parser {
 public:
     explicit Parser(const TokenCollection& tokens)
@@ -42,11 +44,50 @@ public:
         return nullptr;
     }
 
+    bool ConsumeOneOf(const Vector<TokenType>& tokens) {
+        for (TokenType token : tokens) {
+            if (Consume(token)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    ASTNodeRef ParseAdditiveExpression() {
+        auto left = ParseMultiplicativeExpression();
+        while (ConsumeOneOf({ TokenType::PLUS, TokenType::MINUS })) {
+            TokenType op = GetPrevToken().type;
+            if (auto right = ParseMultiplicativeExpression()) {
+                left = MakeShared<BinaryExpression>(op, left, right);
+            }
+        }
+
+        return left;
+    }
+
+    ASTNodeRef ParseMultiplicativeExpression() {
+        ASTNodeRef left = ParseExpression();
+        while (ConsumeOneOf({ TokenType::STAR, TokenType::SLASH })) {
+            TokenType op = GetPrevToken().type;
+            if (auto right = ParseExpression()) {
+                left = MakeShared<BinaryExpression>(op, left, right);
+            }
+        }
+
+        return left;
+    }
+
+    ASTNodeRef ParseAssignmentExpression() {
+        TRY_PARSE(AdditiveExpression);
+        return nullptr;
+    }
+
     ASTNodeRef ParseVariableDeclaration() {
         if (Consume(TokenType::LET) && Consume(TokenType::IDENTIFIER)) {
             auto identifierName = std::get<String>(GetPrevToken().data);
             if (Consume(TokenType::EQUALS)) {
-                if (auto initialValueExpr = ParseExpression()) {
+                if (auto initialValueExpr = ParseAdditiveExpression()) {
                     if (Consume(TokenType::SEMI_COLON)) {
                         return MakeShared<VariableDeclaration>(identifierName, initialValueExpr);
                     }
@@ -118,8 +159,8 @@ public:
     }
 
     ASTNodeRef ParseTopStatement() {
-        if (auto decl = ParseFunctionDeclaration()) return decl;
-        else if (auto decl = ParseVariableDeclaration()) return decl;
+        TRY_PARSE(FunctionDeclaration);
+        TRY_PARSE(VariableDeclaration);
         return nullptr;
     }
 
