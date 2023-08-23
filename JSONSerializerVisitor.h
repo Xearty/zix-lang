@@ -34,7 +34,7 @@
 
 class JSONSerializerVisitor final : public ASTVisitor {
 public:
-    EXPRESSION_LIST(DEFINE_VISITOR_OVERLOADS);
+    AST_NODES_LIST(DEFINE_VISITOR_OVERLOADS);
 
 private:
     void Serialize(const ASTNodeRef& expr) {

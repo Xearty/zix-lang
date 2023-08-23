@@ -29,7 +29,7 @@ using ASTNodeRef = SharedPtr<ASTNode>;
 #define DEFINE_PROPERTY_GETTERS_CONST(TYPE, NAME) \
     const TYPE& Get##NAME() const { return m_##NAME; }
 
-#define DEFINE_EXPRESSIONS(NAME, PROPERTIES)                                 \
+#define DEFINE_AST_NODES(NAME, PROPERTIES)                                   \
     struct NAME final : public ASTNode {                                     \
         explicit NAME(PROPERTIES(EXPAND_INIT_PARAMETERS) bool dummy = false) \
             : PROPERTIES(EXPAND_INIT_LIST) m_Dummy(dummy) {}                 \
@@ -52,5 +52,5 @@ using ASTNodeRef = SharedPtr<ASTNode>;
         bool m_Dummy = false;                                                \
     };
 
-EXPRESSION_LIST(DEFINE_EXPRESSIONS);
+AST_NODES_LIST(DEFINE_AST_NODES);
 

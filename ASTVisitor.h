@@ -6,6 +6,6 @@
     virtual void Visit(const NAME& node) = 0;
 
 struct ASTVisitor {
-    EXPRESSION_LIST(DEFINE_VISITOR_INTERFACE)
+    AST_NODES_LIST(DEFINE_VISITOR_INTERFACE)
 };
 

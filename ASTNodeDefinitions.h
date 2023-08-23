@@ -5,7 +5,7 @@
 #define TOP_STATEMENTS_PROPERTIES(MACRO) \
     MACRO(Vector<ASTNodeRef>, Statements)
 
-#define FOR_EXPRESSION_PROPERTIES(MACRO) \
+#define FOR_STATEMENT_PROPERTIES(MACRO) \
     MACRO(ASTNodeRef, Initialization) \
     MACRO(ASTNodeRef, Condition)      \
     MACRO(ASTNodeRef, Increment)
@@ -26,9 +26,9 @@
 #define IDENTIFIER_EXPRESSION_PROPERTIES(MACRO) \
     MACRO(String, Name)
 
-#define EXPRESSION_LIST(MACRO)                                             \
+#define AST_NODES_LIST(MACRO)                                              \
     MACRO(TopStatements, TOP_STATEMENTS_PROPERTIES)                        \
-    MACRO(ForStatement, FOR_EXPRESSION_PROPERTIES)                         \
+    MACRO(ForStatement, FOR_STATEMENT_PROPERTIES)                          \
     MACRO(FunctionDeclaration, FUNCTION_DECLARATION_PROPERTIES)            \
     MACRO(VariableDeclaration, VARIABLE_DECLARATION_PROPERTIES)            \
     MACRO(IntegerLiteralExpression, INTEGER_LITERAL_EXPRESSION_PROPERTIES) \
