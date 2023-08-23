@@ -8,9 +8,9 @@
 
 #define SERIALIZE_PROPERTIES(TYPE, NAME)             \
     ++currentProp;                                   \
-    m_Output << '"' << #NAME << "\": ";             \
+    m_Output << '"' << #NAME << "\": ";              \
     Serialize(node.Get##NAME());                     \
-    PrepareForNextElement(currentProp != totalProps);
+    PrepareForNextElement(currentProp == totalProps);
 
 #define COUNT_PROPERTIES(TYPE, NAME) ++totalProps;
 
@@ -19,17 +19,17 @@
         int totalProps = 0;                         \
         int currentProp = 0;                        \
         PROPERTIES(COUNT_PROPERTIES);               \
-        m_Output << "{\n";                         \
+        m_Output << "{\n";                          \
         PushIndentLevel();                          \
         Indent();                                   \
-        m_Output << "\"NodeType\": \""#NAME"\"";   \
+        m_Output << "\"NodeType\": \""#NAME"\"";    \
         if (totalProps > 0) {                       \
-            PrepareForNextElement(true);            \
+            PrepareForNextElement(false);           \
         }                                           \
         PROPERTIES(SERIALIZE_PROPERTIES);           \
         PopIndentLevel();                           \
         Indent();                                   \
-        m_Output << "}";                           \
+        m_Output << "}";                            \
     }
 
 
@@ -67,7 +67,7 @@ private:
         Indent();
         m_Output << "\"Identifier\": ";
         Serialize(param.name);
-        PrepareForNextElement(true);
+        PrepareForNextElement(false);
         m_Output << "\"Type\": ";
         Serialize(param.type);
         m_Output << '\n';
@@ -90,7 +90,7 @@ private:
 
             for (size_t i = 0; i < vec.size() - 1; ++i) {
                 Serialize(vec[i]);
-                PrepareForNextElement(true);
+                PrepareForNextElement(false);
             }
 
             Serialize(vec.back());
@@ -101,10 +101,10 @@ private:
         m_Output << ']';
     }
 
-    void PrepareForNextElement(bool shouldInsertComma) {
-        if (shouldInsertComma) m_Output << ",";
+    void PrepareForNextElement(bool isLast) {
+        if (!isLast) m_Output << ",";
         m_Output << "\n";
-        if (shouldInsertComma) Indent();
+        if (!isLast) Indent();
     }
 
     void Indent() {
