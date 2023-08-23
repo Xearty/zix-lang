@@ -67,21 +67,28 @@ enum class TokenType {
 using TokenData = std::variant<std::monostate, String, int>;
 using TokenCollection = Vector<struct Token>;
 
+struct Location {
+    int line;
+    int column;
+};
+
 struct Token {
     TokenType type;
     TokenData data;
+    Location location;
 };
 
 template <TokenType TType>
-Token CreateToken() {
+Token CreateToken(Location location) {
     Token token;
     token.type = TType;
+    token.location = location;
     return token;
 }
 
 template <TokenType TType, typename ValueType>
-Token CreateTokenData(ValueType value) {
-    Token token = CreateToken<TType>();
+Token CreateTokenData(ValueType value, Location location) {
+    Token token = CreateToken<TType>(location);
     token.data = std::move(value);
     return token;
 }

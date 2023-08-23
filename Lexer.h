@@ -27,6 +27,14 @@ struct Lexer {
     }
 
     void Advance(int steps = 1) {
+        for (int i = 0; i < steps; ++i) {
+            if (Peek() == '\n') {
+                m_Location.line++;
+                m_Location.column = 0;
+            } else {
+                m_Location.column++;
+            }
+        }
         m_Offset += steps;
     }
 
@@ -50,6 +58,10 @@ struct Lexer {
         return m_Offset;
     }
 
+    const Location& GetLocation() const {
+        return m_Location;
+    }
+
     const char* GetStream() const {
         return m_Stream;
     }
@@ -57,8 +69,8 @@ struct Lexer {
 private:
     const char* m_Stream = nullptr;
     int m_Offset = 0;
+    Location m_Location = { 1, 1 };
     bool m_IsDone = false;
-
 };
 
 void SkipWhitespace(Lexer& lexer) {
@@ -86,7 +98,7 @@ bool TryParseToken(Lexer& lexer, Token& token) {
             }                                                                \
         }                                                                    \
         lexer.Advance(len);                                                  \
-        token = CreateToken<TokenType::TOKEN_NAME>();                        \
+        token = CreateToken<TokenType::TOKEN_NAME>(lexer.GetLocation());     \
         return true;                                                         \
     }
 
@@ -106,7 +118,7 @@ bool TryParseToken<TokenType::IDENTIFIER>(Lexer& lexer, Token& token) {
         lexer.Advance();
     }
 
-    token = CreateTokenData<TokenType::IDENTIFIER>(std::move(value));
+    token = CreateTokenData<TokenType::IDENTIFIER>(std::move(value), lexer.GetLocation());
     return true;
 }
 
@@ -126,7 +138,7 @@ bool TryParseToken<TokenType::INT_LITERAL>(Lexer& lexer, Token& token) {
     }
 
     lexer.Advance(litLen);
-    token = CreateTokenData<TokenType::INT_LITERAL>(value);
+    token = CreateTokenData<TokenType::INT_LITERAL>(value, lexer.GetLocation());
     return true;
 }
 
@@ -146,7 +158,7 @@ bool TryParseToken<TokenType::STR_LITERAL>(Lexer& lexer, Token& token) {
     String value = std::string(lexer.GetView(begin, lexer.GetOffset()));
     lexer.Advance();
 
-    token = CreateTokenData<TokenType::STR_LITERAL>(std::move(value));
+    token = CreateTokenData<TokenType::STR_LITERAL>(std::move(value), lexer.GetLocation());
     return true;
 }
 
@@ -154,7 +166,7 @@ template <>
 bool TryParseToken<TokenType::END_OF_FILE>(Lexer& lexer, Token& token) {
     bool reachedEOF =  !lexer.HasStream() || lexer.Peek() == '\0';
     if (reachedEOF) {
-        token = CreateToken<TokenType::END_OF_FILE>();
+        token = CreateToken<TokenType::END_OF_FILE>(lexer.GetLocation());
         lexer.Done();
     }
 

@@ -180,9 +180,11 @@ public:
         Parser parser(tokens);
         auto statements = parser.ParseTopStatements();
 
-        TokenType currentTokenType = parser.GetCurrentToken().type;
-        if(currentTokenType != TokenType::END_OF_FILE) {
-            std::cout << "Unexpected token: " << GetTokenName(currentTokenType) << std::endl;
+        const Token& currentToken = parser.GetCurrentToken();
+        if(currentToken.type != TokenType::END_OF_FILE) {
+            std::cout << "Unexpected token: " << GetTokenName(currentToken.type);
+            std::cout << " (" << currentToken.location.line << ":" << currentToken.location.column << ")";
+            std::cout << std::endl;
         }
         return statements;
     }
