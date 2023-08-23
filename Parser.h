@@ -176,7 +176,6 @@ public:
         Parser parser(tokens);
         auto statements = parser.ParseTopStatements();
 
-        // We failed to parse the file
         TokenType currentTokenType = parser.GetCurrentToken().type;
         if(currentTokenType != TokenType::END_OF_FILE) {
             std::cout << "Unexpected token: " << GetTokenName(currentTokenType) << std::endl;
