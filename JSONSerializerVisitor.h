@@ -8,7 +8,7 @@
 
 #define SERIALIZE_PROPERTIES(TYPE, NAME)             \
     ++currentProp;                                   \
-    std::cout << '"' << #NAME << "\": ";             \
+    m_Output << '"' << #NAME << "\": ";             \
     Serialize(node.Get##NAME());                     \
     PrepareForNextElement(currentProp != totalProps);
 
@@ -19,22 +19,25 @@
         int totalProps = 0;                         \
         int currentProp = 0;                        \
         PROPERTIES(COUNT_PROPERTIES);               \
-        std::cout << "{\n";                         \
+        m_Output << "{\n";                         \
         PushIndentLevel();                          \
         Indent();                                   \
-        std::cout << "\"NodeType\": \""#NAME"\"";   \
+        m_Output << "\"NodeType\": \""#NAME"\"";   \
         if (totalProps > 0) {                       \
             PrepareForNextElement(true);            \
         }                                           \
         PROPERTIES(SERIALIZE_PROPERTIES);           \
         PopIndentLevel();                           \
         Indent();                                   \
-        std::cout << "}";                           \
+        m_Output << "}";                           \
     }
 
 
 class JSONSerializerVisitor final : public ASTVisitor {
 public:
+    explicit JSONSerializerVisitor(std::ostream& output = std::cout)
+        : m_Output(output) {}
+
     AST_NODES_LIST(DEFINE_VISITOR_OVERLOADS);
 
 private:
@@ -43,15 +46,15 @@ private:
     }
 
     void Serialize(int val) {
-        std::cout << '"' << val << '"';
+        m_Output << '"' << val << '"';
     }
 
     void Serialize(const String& val) {
-        std::cout << '"' << val << '"';
+        m_Output << '"' << val << '"';
     }
 
     void Serialize(TokenType token) {
-        std::cout << '"' << GetTokenName(token) << '"';
+        m_Output << '"' << GetTokenName(token) << '"';
     }
 
     void Serialize(const Vector<ASTNodeRef>& vec) {
@@ -59,18 +62,18 @@ private:
     }
 
     void Serialize(const FuncParam& param) {
-        std::cout << "{\n";
+        m_Output << "{\n";
         PushIndentLevel();
         Indent();
-        std::cout << "\"Identifier\": ";
+        m_Output << "\"Identifier\": ";
         Serialize(param.name);
         PrepareForNextElement(true);
-        std::cout << "\"Type\": ";
+        m_Output << "\"Type\": ";
         Serialize(param.type);
-        std::cout << '\n';
+        m_Output << '\n';
         PopIndentLevel();
         Indent();
-        std::cout << "}";
+        m_Output << "}";
     }
 
     void Serialize(const Vector<FuncParam>& vec) {
@@ -79,10 +82,10 @@ private:
 
     template <typename T>
     void SerializeVector(const Vector<T>& vec) {
-        std::cout << "[";
+        m_Output << "[";
         if (!vec.empty()) {
             PushIndentLevel();
-            std::cout << '\n';
+            m_Output << '\n';
             Indent();
 
             for (size_t i = 0; i < vec.size() - 1; ++i) {
@@ -92,21 +95,21 @@ private:
 
             Serialize(vec.back());
             PopIndentLevel();
-            std::cout << '\n';
+            m_Output << '\n';
             Indent();
         }
-        std::cout << ']';
+        m_Output << ']';
     }
 
     void PrepareForNextElement(bool shouldInsertComma) {
-        if (shouldInsertComma) std::cout << ",";
-        std::cout << "\n";
+        if (shouldInsertComma) m_Output << ",";
+        m_Output << "\n";
         if (shouldInsertComma) Indent();
     }
 
     void Indent() {
         for (int i = 0; i < m_IndentLevel; ++i) {
-            std::cout << "    ";
+            m_Output << "    ";
         }
     }
 
@@ -120,5 +123,6 @@ private:
 
 private:
     int m_IndentLevel = 0;
+    std::ostream& m_Output;
 };
 
