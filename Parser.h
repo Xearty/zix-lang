@@ -5,13 +5,14 @@
 #include "ASTNode.h"
 
 #include <cassert>
+#include <algorithm>
 
 #define TRY_PARSE(AST_NODE) if (auto node = Parse##AST_NODE()) return node
 
 class Parser {
 public:
-    explicit Parser(const TokenCollection& tokens)
-        : m_Tokens(tokens)
+    explicit Parser(TokenCollection tokens)
+        : m_Tokens(std::move(tokens))
     {}
 
     bool Consume(TokenType type) {
@@ -22,11 +23,11 @@ public:
         return false;
     }
 
-    const Token& GetCurrentToken() const {
+    [[nodiscard]] const Token& GetCurrentToken() const {
         return m_Tokens[m_Current];
     }
 
-    const Token& GetPrevToken() const {
+    [[nodiscard]] const Token& GetPrevToken() const {
         assert(m_Current > 0);
         return m_Tokens[m_Current - 1];
     }
@@ -45,13 +46,9 @@ public:
     }
 
     bool ConsumeOneOf(const Vector<TokenType>& tokens) {
-        for (TokenType token : tokens) {
-            if (Consume(token)) {
-                return true;
-            }
-        }
-
-        return false;
+        return std::any_of(tokens.begin(), tokens.end(),[this](TokenType token) {
+            return Consume(token);
+        });
     }
 
     ASTNodeRef ParseAdditiveExpression() {
