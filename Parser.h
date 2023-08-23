@@ -60,6 +60,8 @@ public:
             TokenType op = GetPrevToken().type;
             if (auto right = ParseMultiplicativeExpression()) {
                 left = MakeShared<BinaryExpression>(op, left, right);
+            } else {
+                return nullptr;
             }
         }
 
@@ -72,6 +74,8 @@ public:
             TokenType op = GetPrevToken().type;
             if (auto right = ParseExpression()) {
                 left = MakeShared<BinaryExpression>(op, left, right);
+            } else {
+                return nullptr;
             }
         }
 
