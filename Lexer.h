@@ -188,6 +188,8 @@ auto Tokenize(Lexer& lexer) -> Result<TokenCollection, LexError> {
         if (TryParseNextToken(lexer, token)) {
             tokens.push_back(token);
         } else {
+            const char* tokenName = GetTokenName(tokens.back().type);
+            std::cout << "Last parsed token: " << tokenName << std::endl;
             return Err(LexError::INVALID_TOKEN);
         }
     }

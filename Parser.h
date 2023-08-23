@@ -20,6 +20,10 @@ public:
         return false;
     }
 
+    const Token& GetCurrentToken() const {
+        return m_Tokens[m_Current];
+    }
+
     const Token& GetPrevToken() const {
         assert(m_Current > 0);
         return m_Tokens[m_Current - 1];
@@ -129,7 +133,14 @@ public:
 
     static ASTNodeRef Parse(const TokenCollection& tokens) {
         Parser parser(tokens);
-        return parser.ParseTopStatements();
+        auto statements = parser.ParseTopStatements();
+
+        // We failed to parse the file
+        TokenType currentTokenType = parser.GetCurrentToken().type;
+        if(currentTokenType != TokenType::END_OF_FILE) {
+            std::cout << "Unexpected token: " << GetTokenName(currentTokenType) << std::endl;
+        }
+        return statements;
     }
 
 private:
