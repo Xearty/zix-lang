@@ -3,6 +3,7 @@
 #include "CommonTypes.h"
 #include "ASTVisitor.h"
 #include "ASTNodeDefinitions.h"
+#include "Token.h"
 
 struct ASTNode {
     virtual const char* GetNodeName() const = 0;
@@ -34,11 +35,11 @@ using ASTNodeRef = SharedPtr<ASTNode>;
         explicit NAME(PROPERTIES(EXPAND_INIT_PARAMETERS) bool dummy = false) \
             : PROPERTIES(EXPAND_INIT_LIST) m_Dummy(dummy) {}                 \
                                                                              \
-        void Accept(ASTVisitor& visitor) override {                          \
+        virtual void Accept(ASTVisitor& visitor) override {                  \
             visitor.Visit(*this);                                            \
         }                                                                    \
                                                                              \
-        void Accept(ASTVisitor&& visitor) override {                         \
+        virtual void Accept(ASTVisitor&& visitor) override {                 \
             visitor.Visit(*this);                                            \
         }                                                                    \
                                                                              \
