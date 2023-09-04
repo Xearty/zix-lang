@@ -65,7 +65,7 @@ enum class TokenType {
 #undef DECLARE_TOKENS
 
 using TokenData = std::variant<std::monostate, String, int>;
-using TokenCollection = Vector<struct Token>;
+using TokenList = Vector<struct Token>;
 
 struct Location {
     int line;

@@ -186,12 +186,12 @@ bool TryParseNextToken(Lexer& lexer, Token& token) {
         TOKEN_LIST(TRY_PARSE_TOKEN);
 }
 
-auto Tokenize(Lexer& lexer) -> Result<TokenCollection, LexError> {
+auto Tokenize(Lexer& lexer) -> Result<TokenList, LexError> {
     if (!lexer.HasStream()) {
         return Err(LexError::NO_STREAM);
     }
 
-    TokenCollection tokens;
+    TokenList tokens;
     Token token;
 
     while (!lexer.IsDone()) {

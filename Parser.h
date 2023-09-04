@@ -11,7 +11,7 @@
 
 class Parser {
 public:
-    explicit Parser(TokenCollection tokens)
+    explicit Parser(TokenList tokens)
         : m_Tokens(std::move(tokens))
     {}
 
@@ -46,7 +46,7 @@ public:
     }
 
     bool ConsumeOneOf(const Vector<TokenType>& tokens) {
-        return std::any_of(tokens.begin(), tokens.end(),[this](TokenType token) {
+        return std::any_of(tokens.begin(), tokens.end(), [this](TokenType token) {
             return Consume(token);
         });
     }
@@ -173,12 +173,12 @@ public:
         return MakeShared<TopStatements>(statements);
     }
 
-    static ASTNodeRef Parse(const TokenCollection& tokens) {
+    static ASTNodeRef Parse(const TokenList& tokens) {
         Parser parser(tokens);
         auto statements = parser.ParseTopStatements();
 
         const Token& currentToken = parser.GetCurrentToken();
-        if(currentToken.type != TokenType::END_OF_FILE) {
+        if (currentToken.type != TokenType::END_OF_FILE) {
             std::cout << "Unexpected token: " << GetTokenName(currentToken.type);
             std::cout << " (" << currentToken.location.line << ":" << currentToken.location.column << ")";
             std::cout << std::endl;
@@ -187,11 +187,11 @@ public:
     }
 
 private:
-    TokenCollection m_Tokens;
+    TokenList m_Tokens;
     int m_Current = 0;
 };
 
-static ASTNodeRef Parse(const TokenCollection& tokens) {
+static ASTNodeRef Parse(const TokenList& tokens) {
     return Parser::Parse(tokens);
 }
 
